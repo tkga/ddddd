@@ -1,25 +1,18 @@
-import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import { redirect } from "next/navigation";
+import Nav from "@/components/Nav";
+import { ToastProvider } from "@/components/toast";
+import { isAuthed } from "@/lib/auth";
 
-export const metadata: Metadata = {
-  title: "ระบบจัดการร้าน",
-  description: "จัดการออเดอร์ สต็อก ลูกค้า และการเงินของร้าน",
-  robots: { index: false, follow: false },
-};
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#14213d" };
+export const dynamic = "force-dynamic";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  if (!(await isAuthed())) redirect("/login");
   return (
-    <html lang="th">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
-        />
-      </head>
-      <body>{children}</body>
-    </html>
+    <ToastProvider>
+      <Nav />
+      <div className="md:pl-56">
+        <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-5 md:px-8 md:pb-12 md:pt-8">{children}</main>
+      </div>
+    </ToastProvider>
   );
 }
